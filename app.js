@@ -1,6 +1,7 @@
 const cfg = window.HAULNOW_CONFIG || {};
 let db = null;
 let currentUser = null;
+let isAdmin = false;
 let listings = [];
 let bookings = [];
 let editingListingId = null;
@@ -42,8 +43,15 @@ async function ensureProfile() {
   return true;
 }
 
+async function loadAdminStatus() {
+  isAdmin = false;
+  if (!db || !currentUser) return;
+  const { data, error } = await db.from("profiles").select("role").eq("id", currentUser.id).maybeSingle();
+  if (!error && data?.role === "admin") isAdmin = true;
+}
+
 async function init() {
-  try { await loadUser(); await loadListings(); await loadBookings(); }
+  try { await loadUser(); await loadAdminStatus(); await loadListings(); await loadBookings(); }
   catch (err) { console.error(err); listings = demoListings; setStatus("Preview marketplace", false); }
   wireControls(); render(); renderBookings();
 }
@@ -53,7 +61,7 @@ async function loadUser() {
   const { data } = await db.auth.getUser();
   currentUser = data?.user || null;
   if (currentUser) await ensureProfile();
-  safe("userBox").textContent = currentUser ? `Signed in as ${currentUser.email}` : "Not signed in";
+  safe("userBox").textContent = currentUser ? `Signed in as ${currentUser.email}${isAdmin ? " · Admin" : ""}` : "Not signed in";
 }
 
 async function signIn() {
@@ -77,7 +85,7 @@ async function signUp() {
   toast("Account created. Sign in if needed.");
 }
 
-async function signOut() { if (db) await db.auth.signOut(); currentUser = null; editingListingId = null; safe("userBox").textContent = "Not signed in"; render(); toast("Signed out"); }
+async function signOut() { if (db) await db.auth.signOut(); currentUser = null; isAdmin = false; editingListingId = null; safe("userBox").textContent = "Not signed in"; render(); toast("Signed out"); }
 
 async function loadListings() {
   if (!db) { listings = demoListings; return; }
@@ -88,7 +96,9 @@ async function loadListings() {
 
 async function loadBookings() {
   if (!db || !currentUser) { bookings = []; return; }
-  const { data, error } = await db.from("bookings").select("*").or(`owner_id.eq.${currentUser.id},renter_id.eq.${currentUser.id}`).order("created_at", { ascending: false });
+  let query = db.from("bookings").select("*").order("created_at", { ascending: false });
+  if (!isAdmin) query = query.or(`owner_id.eq.${currentUser.id},renter_id.eq.${currentUser.id}`);
+  const { data, error } = await query;
   if (error) { console.error(error); bookings = []; return; }
   bookings = data || [];
 }
@@ -111,7 +121,9 @@ async function createListing(e) {
   if (!item.title || !item.city || !item.rate || !item.owner || !item.phone) return toast("Fill out title, city, rate, owner, and phone");
 
   if (editingListingId) {
-    const { error } = await db.from("truck_listings").update(item).eq("id", editingListingId).eq("owner_id", currentUser.id);
+    let query = db.from("truck_listings").update(item).eq("id", editingListingId);
+    if (!isAdmin) query = query.eq("owner_id", currentUser.id);
+    const { error } = await query;
     if (error) return toast(error.message);
     editingListingId = null;
     toast("Listing updated");
@@ -126,10 +138,12 @@ async function createListing(e) {
   await loadListings(); render(); location.hash = "browse";
 }
 
+function canManageListing(listing) { return currentUser && (isAdmin || listing.owner_id === currentUser.id); }
+
 function editListing(id) {
   const listing = listings.find((x) => String(x.id) === String(id));
   if (!listing) return toast("Listing not found");
-  if (!currentUser || listing.owner_id !== currentUser.id) return toast("Only the owner can edit this listing");
+  if (!canManageListing(listing)) return toast("You do not have permission to edit this listing");
   editingListingId = listing.id;
   safe("title").value = listing.title || "";
   safe("type").value = listing.type || "Pickup Truck";
@@ -145,15 +159,20 @@ function editListing(id) {
   safe("image").value = listing.image || "";
   safe("listingSubmitText").textContent = "Save changes";
   location.hash = "list";
-  toast("Editing listing");
+  toast(isAdmin ? "Admin editing listing" : "Editing listing");
 }
 
 async function deleteListing(id) {
   if (!db) return toast("Database not connected yet");
   if (!currentUser) return toast("Sign in first");
-  const ok = confirm("Remove this listing from public view?");
+  const listing = listings.find((x) => String(x.id) === String(id));
+  if (!listing) return toast("Listing not found");
+  if (!canManageListing(listing)) return toast("You do not have permission to remove this listing");
+  const ok = confirm(isAdmin ? "Admin remove this listing from public view?" : "Remove this listing from public view?");
   if (!ok) return;
-  const { error } = await db.from("truck_listings").update({ is_active: false }).eq("id", id).eq("owner_id", currentUser.id);
+  let query = db.from("truck_listings").update({ is_active: false }).eq("id", id);
+  if (!isAdmin) query = query.eq("owner_id", currentUser.id);
+  const { error } = await query;
   if (error) return toast(error.message);
   toast("Listing removed");
   await loadListings(); render();
@@ -172,6 +191,13 @@ async function requestBooking(id) {
 
 async function updateBooking(id, status) { if (!db) return toast("Database not connected yet"); const { error } = await db.from("bookings").update({ status }).eq("id", id); if (error) return toast(error.message); toast("Booking updated"); await loadBookings(); renderBookings(); }
 
+async function adminCancelBooking(id) {
+  if (!isAdmin) return toast("Admin access required");
+  const ok = confirm("Admin cancel this booking?");
+  if (!ok) return;
+  await updateBooking(id, "cancelled_by_admin");
+}
+
 function renderTypes() {
   const select = safe("typeFilter");
   if (!select.innerHTML && select !== $("typeFilter")) return;
@@ -183,6 +209,7 @@ function renderTypes() {
 
 function render() {
   renderTypes();
+  safe("userBox").textContent = currentUser ? `Signed in as ${currentUser.email}${isAdmin ? " · Admin" : ""}` : "Not signed in";
   const q = (safe("search").value || "").toLowerCase();
   const driver = safe("driverFilter").value || "All";
   const type = safe("typeFilter").value || "All";
@@ -192,15 +219,18 @@ function render() {
   });
   safe("statListings").textContent = listings.length; safe("statDriver").textContent = listings.filter(driverIncluded).length; safe("statBookings").textContent = bookings.length; safe("resultCount").textContent = shown.length; safe("emptyState").style.display = shown.length ? "none" : "block";
   safe("truckGrid").innerHTML = shown.map((x) => {
-    const ownerControls = currentUser && x.owner_id === currentUser.id ? `<div class="contacts" style="margin-top:10px"><button class="btn green" onclick="editListing('${x.id}')">Edit</button><button class="btn danger" onclick="deleteListing('${x.id}')">Remove</button></div>` : "";
-    return `<article class="card truck"><div class="img">${x.image ? `<img src="${x.image}" alt="${x.title}">` : `<div style="height:100%;display:grid;place-items:center;font-size:3rem">🚚</div>`}<div class="price">$${x.rate}/${x.rate_type}</div>${x.verified ? `<div class="verified">Verified</div>` : ``}</div><div class="body"><div class="top"><div><h3>${x.title}</h3><div class="loc">📍 ${x.city}</div></div><div class="rating">⭐ ${x.rating || "New"}</div></div><div class="badges"><span class="badge">${x.type}</span><span class="badge">${x.driver_option}</span></div><div class="info"><p><b>Capacity:</b> ${x.capacity || "Ask owner"}</p><p><b>Best for:</b> ${x.use_case || "General hauling"}</p><p><b>Owner:</b> ${x.owner || "Owner"}</p></div><div class="contacts"><button class="btn primary" onclick="requestBooking('${x.id}')">Request Booking</button><a class="btn" href="tel:${x.phone || ""}">Call</a></div>${ownerControls}</div></article>`;
+    const ownerControls = canManageListing(x) ? `<div class="contacts" style="margin-top:10px"><button class="btn green" onclick="editListing('${x.id}')">${isAdmin && x.owner_id !== currentUser?.id ? "Admin Edit" : "Edit"}</button><button class="btn danger" onclick="deleteListing('${x.id}')">${isAdmin && x.owner_id !== currentUser?.id ? "Admin Remove" : "Remove"}</button></div>` : "";
+    return `<article class="card truck"><div class="img">${x.image ? `<img src="${x.image}" alt="${x.title}">` : `<div style="height:100%;display:grid;place-items:center;font-size:3rem">🚚</div>`}<div class="price">$${x.rate}/${x.rate_type}</div>${x.verified ? `<div class="verified">Verified</div>` : ``}</div><div class="body"><div class="top"><div><h3>${x.title}</h3><div class="loc">📍 ${x.city}</div></div><div class="rating">⭐ ${x.rating || "New"}</div></div><div class="badges"><span class="badge">${x.type}</span><span class="badge">${x.driver_option}</span>${isAdmin ? `<span class="badge">Admin view</span>` : ``}</div><div class="info"><p><b>Capacity:</b> ${x.capacity || "Ask owner"}</p><p><b>Best for:</b> ${x.use_case || "General hauling"}</p><p><b>Owner:</b> ${x.owner || "Owner"}</p></div><div class="contacts"><button class="btn primary" onclick="requestBooking('${x.id}')">Request Booking</button><a class="btn" href="tel:${x.phone || ""}">Call</a></div>${ownerControls}</div></article>`;
   }).join("");
 }
 
 function renderBookings() {
   safe("statBookings").textContent = bookings.length;
   if (!bookings.length) { safe("bookingList").innerHTML = `<div class="empty">No bookings yet.</div>`; return; }
-  safe("bookingList").innerHTML = bookings.map((b) => `<div class="bookingRow"><span class="dot">${b.status === "accepted" ? "✓" : b.status === "declined" ? "×" : "!"}</span><div><b>Status: ${b.status}</b><div class="small">Renter: ${b.renter_email || "Unknown"}</div><div class="small">${b.note || ""}</div></div><div class="bookingActions"><button class="btn green" onclick="updateBooking('${b.id}','accepted')">Accept</button><button class="btn danger" onclick="updateBooking('${b.id}','declined')">Decline</button></div></div>`).join("");
+  safe("bookingList").innerHTML = bookings.map((b) => {
+    const adminButton = isAdmin ? `<button class="btn danger" onclick="adminCancelBooking('${b.id}')">Admin Cancel</button>` : "";
+    return `<div class="bookingRow"><span class="dot">${b.status === "accepted" ? "✓" : b.status === "declined" ? "×" : "!"}</span><div><b>Status: ${b.status}</b><div class="small">Renter: ${b.renter_email || "Unknown"}</div><div class="small">${b.note || ""}</div></div><div class="bookingActions"><button class="btn green" onclick="updateBooking('${b.id}','accepted')">Accept</button><button class="btn danger" onclick="updateBooking('${b.id}','declined')">Decline</button>${adminButton}</div></div>`;
+  }).join("");
 }
 
 function wireControls() {

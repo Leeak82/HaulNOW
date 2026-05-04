@@ -1,10 +1,8 @@
 // HaulNOW production config
-// 1. Create a Supabase project
-// 2. Open Project Settings > API
-// 3. Paste your Project URL and anon public key below
-// 4. Do NOT paste the service role key here
+// Public Supabase URL + anon/publishable key are safe for browser apps.
+// Never put a Supabase service_role key or Stripe secret key in this file.
 
 window.HAULNOW_CONFIG = {
-  SUPABASE_URL: "PASTE_SUPABASE_PROJECT_URL_HERE",
-  SUPABASE_ANON_KEY: "PASTE_SUPABASE_ANON_PUBLIC_KEY_HERE"
+  SUPABASE_URL: "https://ywmeizpynnmbpndywqkm.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_qb2nb8i7HHja5qwBwcr1nA_IqnjQSED"
 };

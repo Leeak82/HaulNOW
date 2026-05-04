@@ -1,0 +1,16 @@
+{
+  "name": "HaulNOW Truck Rentals",
+  "short_name": "HaulNOW",
+  "description": "Rent trucks with or without a driver.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#07111f",
+  "theme_color": "#fbbf24",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

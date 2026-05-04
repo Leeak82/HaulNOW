@@ -1,135 +1,47 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>HaulNOW | Truck Rental Marketplace</title>
-  <meta name="description" content="Rent trucks with or without a driver. Owners list trucks. Renters request bookings." />
-  <meta name="theme-color" content="#fbbf24" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js"></script>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>HaulNOW | Truck Rentals</title>
+<meta name="description" content="Rent trucks with or without a driver near you." />
+<link rel="stylesheet" href="styles.css" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
 </head>
 <body>
-  <header class="hero">
-    <div class="wrap">
-      <nav class="nav">
-        <div class="brand"><div class="logo">🚚</div>HaulNOW</div>
-        <div class="navlinks">
-          <a class="btn" href="#browse">Browse</a>
-          <a class="btn" href="#account">Account</a>
-          <a class="btn" href="#dashboard">Dashboard</a>
-          <a class="btn primary" href="#list">List Truck</a>
-        </div>
-      </nav>
+<header class="hero">
+<div class="wrap">
+<nav class="nav">
+<div class="brand"><div class="logo">🚚</div>HaulNOW</div>
+<div class="navlinks">
+<a class="btn" href="#browse">Browse</a>
+<a class="btn" href="#dashboard">Bookings</a>
+<a class="btn primary" href="#list">List Truck</a>
+</div>
+</nav>
 
-      <div class="gridHero">
-        <div>
-          <div class="pill" id="modePill">⚡ Loading marketplace...</div>
-          <h1>Rent trucks with or without a driver.</h1>
-          <p class="lead">Owners list pickups, box trucks, dump trucks, flatbeds, vans, and work trucks. Renters browse, request bookings, and owners accept or decline.</p>
-          <div class="actions">
-            <a class="btn primary" href="#list">➕ List a truck</a>
-            <a class="btn" href="#browse">🔎 Find a truck</a>
-            <a class="btn" href="#account">🔐 Sign in</a>
-            <button class="btn" id="installBtn" style="display:none">📱 Install app</button>
-          </div>
-        </div>
-        <aside class="card statsCard">
-          <div class="mini">Marketplace stats</div>
-          <h2 style="margin:8px 0 0;letter-spacing:-.04em">Manual-pay marketplace mode.</h2>
-          <div class="stats">
-            <div class="stat"><b id="statListings">0</b><span>Listings</span></div>
-            <div class="stat"><b id="statDriver">0</b><span>With driver</span></div>
-            <div class="stat"><b id="statBookings">0</b><span>Bookings</span></div>
-          </div>
-          <div class="notice" id="dbNotice"><b>Checking database...</b></div>
-        </aside>
-      </div>
-    </div>
-  </header>
+<h1>Find and rent trucks near you</h1>
+<p class="lead">Browse available trucks and connect directly with owners.</p>
+</div>
+</header>
 
-  <main>
-    <section id="account">
-      <div class="wrap">
-        <div class="head"><div><div class="mini">Account</div><h2>Owner and renter login</h2><p>Use one account to list trucks and request bookings.</p></div></div>
-        <div class="accountGrid">
-          <form class="card" id="authForm">
-            <div class="formgrid">
-              <div class="span2"><label>Email</label><input id="authEmail" type="email" placeholder="you@example.com" /></div>
-              <div class="span2"><label>Password</label><input id="authPassword" type="password" placeholder="Minimum 6 characters" /></div>
-            </div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
-              <button class="btn blue" type="button" id="signInBtn">Sign in</button>
-              <button class="btn green" type="button" id="signUpBtn">Create account</button>
-              <button class="btn danger" type="button" id="signOutBtn">Sign out</button>
-            </div>
-          </form>
-          <div class="card pad">
-            <h3>Current user</h3>
-            <p id="userBox" class="lead" style="font-size:.98rem">Not signed in.</p>
-            <p class="small">Manual pay mode: bookings happen in-app, payment happens by phone, Cash App, Venmo, Zelle, PayPal, or cash until Stripe is unlocked.</p>
-          </div>
-        </div>
-      </div>
-    </section>
+<main>
+<section id="browse">
+<div class="wrap">
+<h2>Available Trucks</h2>
+<div class="truckgrid" id="truckGrid"></div>
+</div>
+</section>
 
-    <section id="list">
-      <div class="wrap">
-        <div class="head"><div><div class="mini">Owner portal</div><h2>List your truck</h2><p>Public listings save to Supabase when connected.</p></div></div>
-        <form class="card" id="listingForm">
-          <div class="formgrid">
-            <div><label>Truck title *</label><input id="title" required placeholder="2022 Chevy Silverado 3500" /></div>
-            <div><label>Truck type</label><select id="type"><option>Pickup Truck</option><option>Box Truck</option><option>Flatbed</option><option>Dump Truck</option><option>Cargo Van</option><option>Tow Truck</option><option>Semi Truck</option></select></div>
-            <div><label>City / State *</label><input id="city" required placeholder="Tacoma, WA" /></div>
-            <div><label>Rate *</label><input id="rate" type="number" min="1" required placeholder="120" /></div>
-            <div><label>Rate type</label><select id="rateType"><option>day</option><option>hour</option><option>week</option></select></div>
-            <div><label>Driver option</label><select id="driverOption"><option>With or without driver</option><option>Driver included only</option><option>Self-drive only</option></select></div>
-            <div><label>Capacity</label><input id="capacity" placeholder="26 ft box / liftgate" /></div>
-            <div><label>Owner / Company *</label><input id="owner" required placeholder="Your name or company" /></div>
-            <div><label>Phone *</label><input id="phone" required placeholder="(253) 555-0123" /></div>
-            <div><label>Email</label><input id="email" type="email" placeholder="you@example.com" /></div>
-            <div class="span2"><label>Photo URL</label><input id="image" placeholder="Optional image link" /></div>
-            <div class="span4"><label>Best use</label><textarea id="useCase" placeholder="Moving, hauling, trailer towing, jobsite work, dump runs..."></textarea></div>
-          </div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px"><button class="btn blue" type="submit">Publish listing</button><button class="btn" type="button" id="clearFormBtn">Clear form</button></div>
-        </form>
-      </div>
-    </section>
+<section id="dashboard">
+<div class="wrap">
+<h2>Your Bookings</h2>
+<div id="bookingList"></div>
+</div>
+</section>
+</main>
 
-    <section id="browse">
-      <div class="wrap">
-        <div class="head">
-          <div><div class="mini">Browse marketplace</div><h2>Available trucks</h2><p><span id="resultCount">0</span> trucks found</p></div>
-          <div class="filters"><input id="search" placeholder="Search city, truck, use..." /><select id="driverFilter"><option>All</option><option>With Driver</option><option>Self-Drive</option></select><select id="typeFilter"><option>All</option></select></div>
-        </div>
-        <div class="truckgrid" id="truckGrid"></div>
-        <div class="empty" id="emptyState" style="display:none">No trucks match that search. Try clearing a filter.</div>
-      </div>
-    </section>
-
-    <section id="dashboard">
-      <div class="wrap">
-        <div class="head"><div><div class="mini">Booking dashboard</div><h2>Booking requests</h2><p>Owners accept or decline. Renters track status.</p></div><button class="btn" id="refreshBookingsBtn">Refresh</button></div>
-        <div class="card pad"><div id="bookingList" class="steps"><div class="empty">No bookings yet.</div></div></div>
-      </div>
-    </section>
-
-    <section>
-      <div class="wrap">
-        <div class="head"><div><div class="mini">Business mode</div><h2>Manual payments for now</h2><p>Until Stripe is unlocked, use this simple field-tested flow.</p></div></div>
-        <div class="prodgrid">
-          <div class="card prod"><h3>1. Request</h3><b>Renter sends booking</b><p>The booking lands in the owner/renter dashboard.</p></div>
-          <div class="card prod"><h3>2. Confirm</h3><b>Owner accepts</b><p>Owner calls/texts renter to confirm details and payment method.</p></div>
-          <div class="card prod"><h3>3. Pay manually</h3><b>Cash App / Venmo / Zelle / cash</b><p>Keep records until Stripe can be added safely.</p></div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer"><div class="wrap">HaulNOW marketplace. Built for quick launch, then upgrades.</div></footer>
-  <div class="toast" id="toast">Saved</div>
-  <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

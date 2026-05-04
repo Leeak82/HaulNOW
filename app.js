@@ -3,6 +3,7 @@ let db = null;
 let currentUser = null;
 let listings = [];
 let bookings = [];
+let editingListingId = null;
 
 const $ = (id) => document.getElementById(id);
 const safe = (id) => $(id) || { textContent: "", innerHTML: "", value: "", style: {}, onclick: null, onsubmit: null, addEventListener: () => {} };
@@ -76,7 +77,7 @@ async function signUp() {
   toast("Account created. Sign in if needed.");
 }
 
-async function signOut() { if (db) await db.auth.signOut(); currentUser = null; safe("userBox").textContent = "Not signed in"; toast("Signed out"); }
+async function signOut() { if (db) await db.auth.signOut(); currentUser = null; editingListingId = null; safe("userBox").textContent = "Not signed in"; render(); toast("Signed out"); }
 
 async function loadListings() {
   if (!db) { listings = demoListings; return; }
@@ -92,22 +93,70 @@ async function loadBookings() {
   bookings = data || [];
 }
 
+function getListingFormItem() {
+  return {
+    title: safe("title").value.trim(), type: safe("type").value, city: safe("city").value.trim(), rate: Number(safe("rate").value), rate_type: safe("rateType").value,
+    driver_option: safe("driverOption").value, capacity: safe("capacity").value.trim(), use_case: safe("useCase").value.trim(), owner: safe("owner").value.trim(),
+    phone: safe("phone").value.trim(), email: safe("email").value.trim(), image: safe("image").value.trim(), is_active: true
+  };
+}
+
 async function createListing(e) {
   e.preventDefault();
   if (!db) return toast("Database not connected yet");
   if (!currentUser) return toast("Sign in first");
   if (!(await ensureProfile())) return;
 
-  const item = {
-    owner_id: currentUser.id,
-    title: safe("title").value.trim(), type: safe("type").value, city: safe("city").value.trim(), rate: Number(safe("rate").value), rate_type: safe("rateType").value,
-    driver_option: safe("driverOption").value, capacity: safe("capacity").value.trim(), use_case: safe("useCase").value.trim(), owner: safe("owner").value.trim(),
-    phone: safe("phone").value.trim(), email: safe("email").value.trim(), image: safe("image").value.trim(), is_active: true, rating: "New"
-  };
+  const item = getListingFormItem();
   if (!item.title || !item.city || !item.rate || !item.owner || !item.phone) return toast("Fill out title, city, rate, owner, and phone");
-  const { error } = await db.from("truck_listings").insert(item);
+
+  if (editingListingId) {
+    const { error } = await db.from("truck_listings").update(item).eq("id", editingListingId).eq("owner_id", currentUser.id);
+    if (error) return toast(error.message);
+    editingListingId = null;
+    toast("Listing updated");
+  } else {
+    const { error } = await db.from("truck_listings").insert({ ...item, owner_id: currentUser.id, rating: "New" });
+    if (error) return toast(error.message);
+    toast("Truck listed");
+  }
+
+  safe("listingForm").reset?.();
+  safe("listingSubmitText").textContent = "Publish listing";
+  await loadListings(); render(); location.hash = "browse";
+}
+
+function editListing(id) {
+  const listing = listings.find((x) => String(x.id) === String(id));
+  if (!listing) return toast("Listing not found");
+  if (!currentUser || listing.owner_id !== currentUser.id) return toast("Only the owner can edit this listing");
+  editingListingId = listing.id;
+  safe("title").value = listing.title || "";
+  safe("type").value = listing.type || "Pickup Truck";
+  safe("city").value = listing.city || "";
+  safe("rate").value = listing.rate || "";
+  safe("rateType").value = listing.rate_type || "day";
+  safe("driverOption").value = listing.driver_option || "With or without driver";
+  safe("capacity").value = listing.capacity || "";
+  safe("useCase").value = listing.use_case || "";
+  safe("owner").value = listing.owner || "";
+  safe("phone").value = listing.phone || "";
+  safe("email").value = listing.email || "";
+  safe("image").value = listing.image || "";
+  safe("listingSubmitText").textContent = "Save changes";
+  location.hash = "list";
+  toast("Editing listing");
+}
+
+async function deleteListing(id) {
+  if (!db) return toast("Database not connected yet");
+  if (!currentUser) return toast("Sign in first");
+  const ok = confirm("Remove this listing from public view?");
+  if (!ok) return;
+  const { error } = await db.from("truck_listings").update({ is_active: false }).eq("id", id).eq("owner_id", currentUser.id);
   if (error) return toast(error.message);
-  safe("listingForm").reset?.(); toast("Truck listed"); await loadListings(); render(); location.hash = "browse";
+  toast("Listing removed");
+  await loadListings(); render();
 }
 
 async function requestBooking(id) {
@@ -142,7 +191,10 @@ function render() {
     return hay.includes(q) && (driver === "All" || (driver === "With Driver" && driverIncluded(x)) || (driver === "Self-Drive" && selfDrive(x))) && (type === "All" || x.type === type);
   });
   safe("statListings").textContent = listings.length; safe("statDriver").textContent = listings.filter(driverIncluded).length; safe("statBookings").textContent = bookings.length; safe("resultCount").textContent = shown.length; safe("emptyState").style.display = shown.length ? "none" : "block";
-  safe("truckGrid").innerHTML = shown.map((x) => `<article class="card truck"><div class="img">${x.image ? `<img src="${x.image}" alt="${x.title}">` : `<div style="height:100%;display:grid;place-items:center;font-size:3rem">🚚</div>`}<div class="price">$${x.rate}/${x.rate_type}</div>${x.verified ? `<div class="verified">Verified</div>` : ``}</div><div class="body"><div class="top"><div><h3>${x.title}</h3><div class="loc">📍 ${x.city}</div></div><div class="rating">⭐ ${x.rating || "New"}</div></div><div class="badges"><span class="badge">${x.type}</span><span class="badge">${x.driver_option}</span></div><div class="info"><p><b>Capacity:</b> ${x.capacity || "Ask owner"}</p><p><b>Best for:</b> ${x.use_case || "General hauling"}</p><p><b>Owner:</b> ${x.owner || "Owner"}</p></div><div class="contacts"><button class="btn primary" onclick="requestBooking('${x.id}')">Request Booking</button><a class="btn" href="tel:${x.phone || ""}">Call</a></div></div></article>`).join("");
+  safe("truckGrid").innerHTML = shown.map((x) => {
+    const ownerControls = currentUser && x.owner_id === currentUser.id ? `<div class="contacts" style="margin-top:10px"><button class="btn green" onclick="editListing('${x.id}')">Edit</button><button class="btn danger" onclick="deleteListing('${x.id}')">Remove</button></div>` : "";
+    return `<article class="card truck"><div class="img">${x.image ? `<img src="${x.image}" alt="${x.title}">` : `<div style="height:100%;display:grid;place-items:center;font-size:3rem">🚚</div>`}<div class="price">$${x.rate}/${x.rate_type}</div>${x.verified ? `<div class="verified">Verified</div>` : ``}</div><div class="body"><div class="top"><div><h3>${x.title}</h3><div class="loc">📍 ${x.city}</div></div><div class="rating">⭐ ${x.rating || "New"}</div></div><div class="badges"><span class="badge">${x.type}</span><span class="badge">${x.driver_option}</span></div><div class="info"><p><b>Capacity:</b> ${x.capacity || "Ask owner"}</p><p><b>Best for:</b> ${x.use_case || "General hauling"}</p><p><b>Owner:</b> ${x.owner || "Owner"}</p></div><div class="contacts"><button class="btn primary" onclick="requestBooking('${x.id}')">Request Booking</button><a class="btn" href="tel:${x.phone || ""}">Call</a></div>${ownerControls}</div></article>`;
+  }).join("");
 }
 
 function renderBookings() {
@@ -152,7 +204,7 @@ function renderBookings() {
 }
 
 function wireControls() {
-  safe("signInBtn").onclick = signIn; safe("signUpBtn").onclick = signUp; safe("signOutBtn").onclick = signOut; safe("listingForm").onsubmit = createListing; safe("refreshBookingsBtn").onclick = async () => { await loadBookings(); renderBookings(); }; safe("clearFormBtn").onclick = () => safe("listingForm").reset?.(); ["search", "driverFilter", "typeFilter"].forEach((id) => safe(id).addEventListener("input", render));
+  safe("signInBtn").onclick = signIn; safe("signUpBtn").onclick = signUp; safe("signOutBtn").onclick = signOut; safe("listingForm").onsubmit = createListing; safe("refreshBookingsBtn").onclick = async () => { await loadBookings(); renderBookings(); }; safe("clearFormBtn").onclick = () => { editingListingId = null; safe("listingForm").reset?.(); safe("listingSubmitText").textContent = "Publish listing"; }; ["search", "driverFilter", "typeFilter"].forEach((id) => safe(id).addEventListener("input", render));
 }
 
 init();

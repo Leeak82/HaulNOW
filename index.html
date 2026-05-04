@@ -5,43 +5,125 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>HaulNOW | Truck Rentals</title>
 <meta name="description" content="Rent trucks with or without a driver near you." />
+<meta name="theme-color" content="#fbbf24" />
+<link rel="manifest" href="manifest.json" />
 <link rel="stylesheet" href="styles.css" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 </head>
 <body>
 <header class="hero">
-<div class="wrap">
-<nav class="nav">
-<div class="brand"><div class="logo">🚚</div>HaulNOW</div>
-<div class="navlinks">
-<a class="btn" href="#browse">Browse</a>
-<a class="btn" href="#dashboard">Bookings</a>
-<a class="btn primary" href="#list">List Truck</a>
-</div>
-</nav>
+  <div class="wrap">
+    <nav class="nav">
+      <div class="brand"><div class="logo">🚚</div>HaulNOW</div>
+      <div class="navlinks">
+        <a class="btn" href="#browse">Browse</a>
+        <a class="btn" href="#account">Account</a>
+        <a class="btn" href="#dashboard">Bookings</a>
+        <a class="btn primary" href="#list">List Truck</a>
+      </div>
+    </nav>
 
-<h1>Find and rent trucks near you</h1>
-<p class="lead">Browse available trucks and connect directly with owners.</p>
-</div>
+    <div class="gridHero">
+      <div>
+        <div class="pill" id="modePill">Truck rentals near you</div>
+        <h1>Find and rent trucks near you.</h1>
+        <p class="lead">Browse available trucks, request a booking, and connect directly with local owners.</p>
+        <div class="actions">
+          <a class="btn primary" href="#browse">Find a truck</a>
+          <a class="btn" href="#list">List your truck</a>
+        </div>
+      </div>
+      <aside class="card statsCard">
+        <div class="mini">Marketplace</div>
+        <h2 style="margin:8px 0 0">Available now</h2>
+        <div class="stats">
+          <div class="stat"><b id="statListings">0</b><span>Listings</span></div>
+          <div class="stat"><b id="statDriver">0</b><span>With driver</span></div>
+          <div class="stat"><b id="statBookings">0</b><span>Bookings</span></div>
+        </div>
+        <div class="notice ok" id="dbNotice">Ready to browse</div>
+      </aside>
+    </div>
+  </div>
 </header>
 
 <main>
 <section id="browse">
-<div class="wrap">
-<h2>Available Trucks</h2>
-<div class="truckgrid" id="truckGrid"></div>
-</div>
+  <div class="wrap">
+    <div class="head">
+      <div>
+        <div class="mini">Browse</div>
+        <h2>Available trucks</h2>
+        <p><span id="resultCount">0</span> trucks found</p>
+      </div>
+      <div class="filters">
+        <input id="search" placeholder="Search city, truck, use..." />
+        <select id="driverFilter"><option>All</option><option>With Driver</option><option>Self-Drive</option></select>
+        <select id="typeFilter"><option>All</option></select>
+      </div>
+    </div>
+    <div class="truckgrid" id="truckGrid"></div>
+    <div class="empty" id="emptyState" style="display:none">No trucks found yet.</div>
+  </div>
+</section>
+
+<section id="account">
+  <div class="wrap">
+    <div class="head"><div><div class="mini">Account</div><h2>Sign in</h2><p>Use your account to list trucks and manage booking requests.</p></div></div>
+    <div class="accountGrid">
+      <form class="card" id="authForm">
+        <div class="formgrid">
+          <div class="span2"><label>Email</label><input id="authEmail" type="email" placeholder="you@example.com" /></div>
+          <div class="span2"><label>Password</label><input id="authPassword" type="password" placeholder="Password" /></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+          <button class="btn blue" type="button" id="signInBtn">Sign in</button>
+          <button class="btn green" type="button" id="signUpBtn">Create account</button>
+          <button class="btn danger" type="button" id="signOutBtn">Sign out</button>
+        </div>
+      </form>
+      <div class="card pad">
+        <h3>Account status</h3>
+        <p id="userBox" class="lead" style="font-size:.98rem">Not signed in.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="list">
+  <div class="wrap">
+    <div class="head"><div><div class="mini">Owners</div><h2>List your truck</h2><p>Add your truck so renters can request it.</p></div></div>
+    <form class="card" id="listingForm">
+      <div class="formgrid">
+        <div><label>Truck title *</label><input id="title" required placeholder="2022 Chevy Silverado 3500" /></div>
+        <div><label>Truck type</label><select id="type"><option>Pickup Truck</option><option>Box Truck</option><option>Flatbed</option><option>Dump Truck</option><option>Cargo Van</option><option>Tow Truck</option><option>Semi Truck</option></select></div>
+        <div><label>City / State *</label><input id="city" required placeholder="Tacoma, WA" /></div>
+        <div><label>Rate *</label><input id="rate" type="number" min="1" required placeholder="120" /></div>
+        <div><label>Rate type</label><select id="rateType"><option>day</option><option>hour</option><option>week</option></select></div>
+        <div><label>Driver option</label><select id="driverOption"><option>With or without driver</option><option>Driver included only</option><option>Self-drive only</option></select></div>
+        <div><label>Capacity</label><input id="capacity" placeholder="26 ft box / liftgate" /></div>
+        <div><label>Owner / Company *</label><input id="owner" required placeholder="Your name or company" /></div>
+        <div><label>Phone *</label><input id="phone" required placeholder="(253) 555-0123" /></div>
+        <div><label>Email</label><input id="email" type="email" placeholder="you@example.com" /></div>
+        <div class="span2"><label>Photo URL</label><input id="image" placeholder="Optional image link" /></div>
+        <div class="span4"><label>Best use</label><textarea id="useCase" placeholder="Moving, hauling, trailer towing, jobsite work, dump runs..."></textarea></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px"><button class="btn blue" type="submit">Publish listing</button><button class="btn" type="button" id="clearFormBtn">Clear form</button></div>
+    </form>
+  </div>
 </section>
 
 <section id="dashboard">
-<div class="wrap">
-<h2>Your Bookings</h2>
-<div id="bookingList"></div>
-</div>
+  <div class="wrap">
+    <div class="head"><div><div class="mini">Bookings</div><h2>Your bookings</h2><p>Track booking requests and respond as an owner.</p></div><button class="btn" id="refreshBookingsBtn">Refresh</button></div>
+    <div class="card pad"><div id="bookingList"><div class="empty">No bookings yet.</div></div></div>
+  </div>
 </section>
 </main>
 
+<footer class="footer"><div class="wrap">HaulNOW © Truck Rentals</div></footer>
+<div class="toast" id="toast">Saved</div>
 <script src="app.js"></script>
 </body>
 </html>

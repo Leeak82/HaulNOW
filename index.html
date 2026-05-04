@@ -1,35 +1,135 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HaulNOW | Truck Rental Marketplace</title>
-<meta name="description" content="List trucks for rent and browse trucks available with or without a driver.">
-<style>
-:root{--bg:#07111f;--card:rgba(255,255,255,.08);--card2:rgba(255,255,255,.13);--line:rgba(255,255,255,.15);--text:#f8fafc;--muted:#a8b3c5;--blue:#38bdf8;--gold:#fbbf24;--green:#34d399;--dark:#0f172a;--r:24px}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:radial-gradient(circle at 10% 0%,rgba(56,189,248,.3),transparent 30%),radial-gradient(circle at 90% 10%,rgba(251,191,36,.22),transparent 30%),linear-gradient(180deg,#06101f,#0b1220 60%,#050814);color:var(--text)}a{text-decoration:none;color:inherit}.wrap{max-width:1180px;margin:auto;padding:0 18px}.hero{padding:28px 0 34px;border-bottom:1px solid var(--line)}.nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:34px}.brand{display:flex;align-items:center;gap:12px;font-size:1.4rem;font-weight:950;letter-spacing:-.05em}.logo{width:43px;height:43px;border-radius:15px;background:linear-gradient(135deg,var(--gold),#fb923c);display:grid;place-items:center;color:#111827}.navlinks{display:flex;gap:10px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:999px;padding:11px 15px;font-weight:850;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px}.btn:hover{background:var(--card2);transform:translateY(-1px)}.primary{background:var(--gold);color:#111827;border-color:transparent}.blue{background:var(--blue);color:#03131f;border-color:transparent}.green{background:var(--green);color:#052014;border-color:transparent}.gridHero{display:grid;grid-template-columns:1.08fr .92fr;gap:22px;align-items:stretch}.pill{display:inline-flex;gap:7px;align-items:center;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 12px;font-size:.86rem;font-weight:850;color:#dbeafe}h1{font-size:clamp(2.4rem,7vw,5.4rem);line-height:.92;letter-spacing:-.08em;margin:18px 0}.lead{font-size:1.08rem;line-height:1.7;color:var(--muted);max-width:720px}.actions{display:flex;gap:11px;flex-wrap:wrap;margin-top:23px}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 24px 70px rgba(0,0,0,.25);backdrop-filter:blur(14px)}.statsCard{padding:20px}.mini{font-size:.76rem;letter-spacing:.2em;text-transform:uppercase;color:#93c5fd;font-weight:950}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}.stat{background:rgba(15,23,42,.75);border:1px solid var(--line);border-radius:18px;padding:14px;text-align:center}.stat b{font-size:1.7rem;display:block}.stat span{font-size:.72rem;color:var(--muted);text-transform:uppercase}.notice{margin-top:14px;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.22);border-radius:18px;padding:13px;color:#dbeafe;line-height:1.55}section{padding:28px 0}.head{display:flex;justify-content:space-between;align-items:end;gap:18px;margin-bottom:17px}.head h2{margin:6px 0 4px;font-size:clamp(1.8rem,4vw,2.7rem);letter-spacing:-.05em}.head p{margin:0;color:var(--muted)}form{padding:18px}.formgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}label{display:block;font-weight:900;font-size:.86rem;margin-bottom:6px;color:#dbe5f5}input,select,textarea{width:100%;border:1px solid var(--line);background:rgba(15,23,42,.85);color:var(--text);border-radius:16px;padding:12px 13px;outline:none}textarea{min-height:80px;resize:vertical}input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(56,189,248,.12)}.span2{grid-column:span 2}.span4{grid-column:span 4}.filters{display:grid;grid-template-columns:1.4fr .8fr .8fr;gap:10px;min-width:min(650px,100%)}.truckgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.truck{overflow:hidden;display:flex;flex-direction:column}.img{height:205px;background:#111827;position:relative}.img img{width:100%;height:100%;object-fit:cover;display:block}.price,.verified{position:absolute;top:12px;border-radius:999px;padding:8px 10px;font-weight:950;font-size:.82rem}.price{left:12px;background:rgba(2,6,23,.84)}.verified{right:12px;background:var(--green);color:#052014}.body{padding:16px;display:flex;flex-direction:column;flex:1}.top{display:flex;justify-content:space-between;gap:10px}.top h3{margin:0;font-size:1.15rem;letter-spacing:-.03em}.loc{color:var(--muted);font-size:.88rem;margin-top:5px}.rating{background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:5px 9px;font-weight:900;white-space:nowrap}.badges{display:flex;gap:7px;flex-wrap:wrap;margin:13px 0}.badge{border:1px solid var(--line);background:rgba(255,255,255,.07);border-radius:999px;padding:6px 9px;font-size:.75rem;font-weight:900}.info{color:#c9d4e4;font-size:.9rem;line-height:1.55}.info p{margin:5px 0}.contacts{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:auto}.empty{text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r);padding:30px}.prodgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.prod{padding:18px}.prod h3{margin:0 0 5px}.prod b{color:#93c5fd;display:block;margin-bottom:10px}.prod p{color:#c9d4e4;line-height:1.55;margin:0}.flow{display:grid;grid-template-columns:.95fr 1.05fr;gap:16px;margin-top:16px}.pad{padding:18px}.steps,.safety{display:grid;gap:10px;margin-top:14px}.step,.safe{display:flex;gap:10px;align-items:center;background:rgba(15,23,42,.77);border:1px solid var(--line);border-radius:17px;padding:12px}.dot{width:32px;height:32px;border-radius:999px;background:var(--gold);color:#111827;display:grid;place-items:center;font-weight:950;flex:none}.safety{grid-template-columns:repeat(2,1fr)}.schema{display:flex;flex-wrap:wrap;gap:9px;margin-top:13px}code{background:rgba(0,0,0,.32);border:1px solid var(--line);color:#bfdbfe;border-radius:13px;padding:9px 11px}.footer{text-align:center;color:var(--muted);padding:26px 0 40px}.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(90px);transition:.25s;background:#020617;border:1px solid var(--line);border-radius:999px;padding:12px 16px;box-shadow:0 20px 50px rgba(0,0,0,.35);font-weight:850;z-index:20}.toast.show{transform:translateX(-50%) translateY(0)}@media(max-width:920px){.gridHero,.flow{grid-template-columns:1fr}.truckgrid,.prodgrid{grid-template-columns:repeat(2,1fr)}.formgrid{grid-template-columns:repeat(2,1fr)}.span4{grid-column:span 2}.filters{grid-template-columns:1fr}.head{align-items:stretch;flex-direction:column}}@media(max-width:620px){.truckgrid,.prodgrid,.stats,.safety{grid-template-columns:1fr}.formgrid{grid-template-columns:1fr}.span2,.span4{grid-column:span 1}.nav{align-items:flex-start;flex-direction:column}.hero{padding-top:22px}}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HaulNOW | Truck Rental Marketplace</title>
+  <meta name="description" content="Rent trucks with or without a driver. Owners list trucks. Renters request bookings." />
+  <meta name="theme-color" content="#fbbf24" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
 </head>
 <body>
-<header class="hero"><div class="wrap"><nav class="nav"><div class="brand"><div class="logo">🚚</div>HaulNOW</div><div class="navlinks"><a class="btn" href="#browse">Browse</a><a class="btn primary" href="#list">List Truck</a></div></nav><div class="gridHero"><div><div class="pill">⚡ Peer-to-peer truck rental marketplace</div><h1>Rent trucks with or without a driver.</h1><p class="lead">Owners list pickups, box trucks, dump trucks, flatbeds, vans, and work trucks. Renters browse by location, rate, type, capacity, and driver option. Open the link, find the truck, make the call.</p><div class="actions"><a class="btn primary" href="#list">➕ List a truck</a><a class="btn" href="#browse">🔎 Find a truck</a><button class="btn" onclick="seedDemo()">🧪 Reset demo data</button></div></div><aside class="card statsCard"><div class="mini">Marketplace stats</div><h2 style="margin:8px 0 0;letter-spacing:-.04em">Simple now. Serious later.</h2><div class="stats"><div class="stat"><b id="statListings">0</b><span>Listings</span></div><div class="stat"><b id="statDriver">0</b><span>With driver</span></div><div class="stat"><b id="statSelf">0</b><span>Self-drive</span></div></div><div class="notice"><b>Live demo mode:</b> listings save in this browser using localStorage. To make every user see the same listings, connect Supabase/Firebase next.</div></aside></div></div></header>
-<main>
-<section id="list"><div class="wrap"><div class="head"><div><div class="mini">Owner portal</div><h2>List your truck</h2><p>Post the essentials renters need before they call.</p></div></div><form class="card" id="listingForm"><div class="formgrid"><div><label>Truck title *</label><input id="title" required placeholder="2022 Chevy Silverado 3500"></div><div><label>Truck type</label><select id="type"><option>Pickup Truck</option><option>Box Truck</option><option>Flatbed</option><option>Dump Truck</option><option>Cargo Van</option><option>Tow Truck</option><option>Semi Truck</option></select></div><div><label>City / State *</label><input id="city" required placeholder="Tacoma, WA"></div><div><label>Rate *</label><input id="rate" type="number" min="1" required placeholder="120"></div><div><label>Rate type</label><select id="rateType"><option>day</option><option>hour</option><option>week</option></select></div><div><label>Driver option</label><select id="driverOption"><option>With or without driver</option><option>Driver included only</option><option>Self-drive only</option></select></div><div><label>Capacity</label><input id="capacity" placeholder="26 ft box / liftgate"></div><div><label>Owner / Company *</label><input id="owner" required placeholder="Your name or company"></div><div><label>Phone *</label><input id="phone" required placeholder="(253) 555-0123"></div><div><label>Email</label><input id="email" type="email" placeholder="you@example.com"></div><div class="span2"><label>Photo URL</label><input id="image" placeholder="Optional image link"></div><div class="span4"><label>Best use</label><textarea id="useCase" placeholder="Moving, hauling, trailer towing, jobsite work, dump runs..."></textarea></div></div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px"><button class="btn blue" type="submit">Publish listing</button><button class="btn" type="button" onclick="clearForm()">Clear form</button></div></form></div></section>
-<section id="browse"><div class="wrap"><div class="head"><div><div class="mini">Browse marketplace</div><h2>Available trucks</h2><p><span id="resultCount">0</span> trucks found</p></div><div class="filters"><input id="search" placeholder="Search city, truck, use..."><select id="driverFilter"><option>All</option><option>With Driver</option><option>Self-Drive</option></select><select id="typeFilter"><option>All</option></select></div></div><div class="truckgrid" id="truckGrid"></div><div class="empty" id="emptyState" style="display:none">No trucks match that search. Try clearing a filter.</div></div></section>
-<section><div class="wrap"><div class="head"><div><div class="mini">Production buildout</div><h2>What makes it better</h2><p>The page works now. These are the power-ups that make it a real business.</p></div></div><div class="prodgrid"><div class="card prod"><h3>Backend API</h3><b>Node.js/Express or FastAPI</b><p>Stores listings, bookings, user profiles, availability, reviews, documents, and admin data.</p></div><div class="card prod"><h3>Auth + Database</h3><b>Supabase or Firebase</b><p>Secure renter/owner accounts, dashboard access, persistent public listings, and saved trucks.</p></div><div class="card prod"><h3>Payments + Payouts</h3><b>Stripe Connect</b><p>Checkout, deposits, refunds, platform fees, payout holds, and owner payouts.</p></div><div class="card prod"><h3>Messaging</h3><b>Twilio / WhatsApp</b><p>Booking confirmations, renter-owner messages, pickup reminders, and support alerts.</p></div><div class="card prod"><h3>Maps + Routing</h3><b>Google Maps / Mapbox</b><p>Pickup areas, delivery estimates, distance, driver ETA, and service radius logic.</p></div><div class="card prod"><h3>Analytics + Email</h3><b>PostHog + SendGrid</b><p>Track conversions, owner performance, abandoned checkout, and lifecycle email flows.</p></div></div><div class="flow"><div class="card pad"><h3>Booking workflow</h3><p class="lead" style="font-size:.98rem">Request, accept, pay, pickup, complete, review. Clean and trackable.</p><div class="steps"><div class="step"><span class="dot">1</span>Request sent</div><div class="step"><span class="dot">2</span>Owner accepts or declines</div><div class="step"><span class="dot">3</span>Checkout + deposit secured</div><div class="step"><span class="dot">4</span>Trip active</div><div class="step"><span class="dot">5</span>Completed + reviewed</div></div></div><div class="card pad"><h3>Trust & safety</h3><p class="lead" style="font-size:.98rem">This is where confidence gets its steel-toe boots.</p><div class="safety"><div class="safe">✅ Verified owners</div><div class="safe">🪪 Renter ID checks</div><div class="safe">📄 Insurance docs</div><div class="safe">💳 Damage deposit holds</div><div class="safe">⭐ Two-way ratings</div><div class="safe">⚖️ Dispute workflow</div></div></div></div><div class="card pad" style="margin-top:16px"><h3>Suggested database tables</h3><div class="schema"><code>users</code><code>owner_profiles</code><code>renter_profiles</code><code>truck_listings</code><code>availability</code><code>bookings</code><code>payments</code><code>payouts</code><code>messages</code><code>reviews</code><code>documents</code><code>disputes</code></div></div></div></section>
-</main><footer class="footer"><div class="wrap">HaulNOW demo marketplace. Share the GitHub Pages link and let the hauling begin.</div></footer><div class="toast" id="toast">Saved</div>
-<script>
-const demo=[{id:1,title:'2021 Ford F-350 Super Duty',type:'Pickup Truck',city:'Tacoma, WA',rate:120,rateType:'day',driverOption:'With or without driver',capacity:'4,200 lb payload',useCase:'Moving, hauling, jobsite runs',owner:'Northwest Haul Pros',phone:'(253) 555-0142',email:'rentals@example.com',image:'https://images.unsplash.com/photo-1605893477799-b99e3b8b93fe?auto=format&fit=crop&w=1200&q=80',verified:true,rating:'4.8'},{id:2,title:'2019 Freightliner Box Truck',type:'Box Truck',city:'Seattle, WA',rate:95,rateType:'hour',driverOption:'Driver included only',capacity:'26 ft box / liftgate',useCase:'Furniture, appliances, business deliveries',owner:'Emerald City Freight',phone:'(206) 555-0188',email:'dispatch@example.com',image:'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1200&q=80',verified:true,rating:'4.9'},{id:3,title:'2020 Ram 2500 Crew Cab',type:'Pickup Truck',city:'Puyallup, WA',rate:85,rateType:'day',driverOption:'Self-drive only',capacity:'3,100 lb payload / tow package',useCase:'Trailer towing, dump runs, weekend hauling',owner:'Rainier Rental Fleet',phone:'(253) 555-0191',email:'bookings@example.com',image:'https://images.unsplash.com/photo-1621993202323-f438eec93450?auto=format&fit=crop&w=1200&q=80',verified:false,rating:'4.6'}];
-let listings=JSON.parse(localStorage.getItem('haulnow_listings')||'null')||demo;
-const $=id=>document.getElementById(id);
-function save(){localStorage.setItem('haulnow_listings',JSON.stringify(listings));}
-function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),1800);}
-function driverIncluded(x){return x.driverOption==='Driver included only'||x.driverOption==='With or without driver'}
-function selfDrive(x){return x.driverOption==='Self-drive only'||x.driverOption==='With or without driver'}
-function renderTypes(){const cur=$('typeFilter').value||'All';const types=['All',...new Set(listings.map(x=>x.type))];$('typeFilter').innerHTML=types.map(t=>`<option>${t}</option>`).join('');$('typeFilter').value=types.includes(cur)?cur:'All'}
-function render(){renderTypes();const q=$('search').value.toLowerCase();const df=$('driverFilter').value;const tf=$('typeFilter').value;const shown=listings.filter(x=>{const hay=`${x.title} ${x.type} ${x.city} ${x.useCase} ${x.capacity} ${x.owner}`.toLowerCase();return hay.includes(q)&&(df==='All'||(df==='With Driver'&&driverIncluded(x))||(df==='Self-Drive'&&selfDrive(x)))&&(tf==='All'||x.type===tf)});$('resultCount').textContent=shown.length;$('statListings').textContent=listings.length;$('statDriver').textContent=listings.filter(driverIncluded).length;$('statSelf').textContent=listings.filter(selfDrive).length;$('emptyState').style.display=shown.length?'none':'block';$('truckGrid').innerHTML=shown.map(x=>`<article class="card truck"><div class="img"><img src="${x.image||'https://images.unsplash.com/photo-1592838064575-70ed626d3a0e?auto=format&fit=crop&w=1200&q=80'}" alt="${x.title}" onerror="this.src='https://images.unsplash.com/photo-1592838064575-70ed626d3a0e?auto=format&fit=crop&w=1200&q=80'"><div class="price">$${x.rate}/${x.rateType}</div>${x.verified?'<div class="verified">Verified</div>':''}</div><div class="body"><div class="top"><div><h3>${x.title}</h3><div class="loc">📍 ${x.city}</div></div><div class="rating">⭐ ${x.rating||'New'}</div></div><div class="badges"><span class="badge">🚚 ${x.type}</span>${driverIncluded(x)?'<span class="badge">👤 Driver available</span>':''}${selfDrive(x)?'<span class="badge">🔑 Self-drive</span>':''}</div><div class="info"><p><b>Capacity:</b> ${x.capacity||'Ask owner'}</p><p><b>Best for:</b> ${x.useCase||'General hauling'}</p><p><b>Owner:</b> ${x.owner}</p></div><div class="contacts"><a class="btn primary" href="tel:${x.phone}">Call</a><a class="btn" href="mailto:${x.email||''}">Email</a></div></div></article>`).join('')}
-function clearForm(){document.getElementById('listingForm').reset();}
-function seedDemo(){listings=[...demo];save();render();toast('Demo data reset');}
-document.getElementById('listingForm').addEventListener('submit',e=>{e.preventDefault();const item={id:Date.now(),title:$('title').value.trim(),type:$('type').value,city:$('city').value.trim(),rate:Number($('rate').value),rateType:$('rateType').value,driverOption:$('driverOption').value,capacity:$('capacity').value.trim(),useCase:$('useCase').value.trim(),owner:$('owner').value.trim(),phone:$('phone').value.trim(),email:$('email').value.trim(),image:$('image').value.trim(),verified:false,rating:'New'};listings=[item,...listings];save();clearForm();render();toast('Truck listing published');location.hash='browse'});
-['search','driverFilter','typeFilter'].forEach(id=>$(id).addEventListener('input',render));render();
-</script>
+  <header class="hero">
+    <div class="wrap">
+      <nav class="nav">
+        <div class="brand"><div class="logo">🚚</div>HaulNOW</div>
+        <div class="navlinks">
+          <a class="btn" href="#browse">Browse</a>
+          <a class="btn" href="#account">Account</a>
+          <a class="btn" href="#dashboard">Dashboard</a>
+          <a class="btn primary" href="#list">List Truck</a>
+        </div>
+      </nav>
+
+      <div class="gridHero">
+        <div>
+          <div class="pill" id="modePill">⚡ Loading marketplace...</div>
+          <h1>Rent trucks with or without a driver.</h1>
+          <p class="lead">Owners list pickups, box trucks, dump trucks, flatbeds, vans, and work trucks. Renters browse, request bookings, and owners accept or decline.</p>
+          <div class="actions">
+            <a class="btn primary" href="#list">➕ List a truck</a>
+            <a class="btn" href="#browse">🔎 Find a truck</a>
+            <a class="btn" href="#account">🔐 Sign in</a>
+            <button class="btn" id="installBtn" style="display:none">📱 Install app</button>
+          </div>
+        </div>
+        <aside class="card statsCard">
+          <div class="mini">Marketplace stats</div>
+          <h2 style="margin:8px 0 0;letter-spacing:-.04em">Manual-pay marketplace mode.</h2>
+          <div class="stats">
+            <div class="stat"><b id="statListings">0</b><span>Listings</span></div>
+            <div class="stat"><b id="statDriver">0</b><span>With driver</span></div>
+            <div class="stat"><b id="statBookings">0</b><span>Bookings</span></div>
+          </div>
+          <div class="notice" id="dbNotice"><b>Checking database...</b></div>
+        </aside>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="account">
+      <div class="wrap">
+        <div class="head"><div><div class="mini">Account</div><h2>Owner and renter login</h2><p>Use one account to list trucks and request bookings.</p></div></div>
+        <div class="accountGrid">
+          <form class="card" id="authForm">
+            <div class="formgrid">
+              <div class="span2"><label>Email</label><input id="authEmail" type="email" placeholder="you@example.com" /></div>
+              <div class="span2"><label>Password</label><input id="authPassword" type="password" placeholder="Minimum 6 characters" /></div>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+              <button class="btn blue" type="button" id="signInBtn">Sign in</button>
+              <button class="btn green" type="button" id="signUpBtn">Create account</button>
+              <button class="btn danger" type="button" id="signOutBtn">Sign out</button>
+            </div>
+          </form>
+          <div class="card pad">
+            <h3>Current user</h3>
+            <p id="userBox" class="lead" style="font-size:.98rem">Not signed in.</p>
+            <p class="small">Manual pay mode: bookings happen in-app, payment happens by phone, Cash App, Venmo, Zelle, PayPal, or cash until Stripe is unlocked.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="list">
+      <div class="wrap">
+        <div class="head"><div><div class="mini">Owner portal</div><h2>List your truck</h2><p>Public listings save to Supabase when connected.</p></div></div>
+        <form class="card" id="listingForm">
+          <div class="formgrid">
+            <div><label>Truck title *</label><input id="title" required placeholder="2022 Chevy Silverado 3500" /></div>
+            <div><label>Truck type</label><select id="type"><option>Pickup Truck</option><option>Box Truck</option><option>Flatbed</option><option>Dump Truck</option><option>Cargo Van</option><option>Tow Truck</option><option>Semi Truck</option></select></div>
+            <div><label>City / State *</label><input id="city" required placeholder="Tacoma, WA" /></div>
+            <div><label>Rate *</label><input id="rate" type="number" min="1" required placeholder="120" /></div>
+            <div><label>Rate type</label><select id="rateType"><option>day</option><option>hour</option><option>week</option></select></div>
+            <div><label>Driver option</label><select id="driverOption"><option>With or without driver</option><option>Driver included only</option><option>Self-drive only</option></select></div>
+            <div><label>Capacity</label><input id="capacity" placeholder="26 ft box / liftgate" /></div>
+            <div><label>Owner / Company *</label><input id="owner" required placeholder="Your name or company" /></div>
+            <div><label>Phone *</label><input id="phone" required placeholder="(253) 555-0123" /></div>
+            <div><label>Email</label><input id="email" type="email" placeholder="you@example.com" /></div>
+            <div class="span2"><label>Photo URL</label><input id="image" placeholder="Optional image link" /></div>
+            <div class="span4"><label>Best use</label><textarea id="useCase" placeholder="Moving, hauling, trailer towing, jobsite work, dump runs..."></textarea></div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px"><button class="btn blue" type="submit">Publish listing</button><button class="btn" type="button" id="clearFormBtn">Clear form</button></div>
+        </form>
+      </div>
+    </section>
+
+    <section id="browse">
+      <div class="wrap">
+        <div class="head">
+          <div><div class="mini">Browse marketplace</div><h2>Available trucks</h2><p><span id="resultCount">0</span> trucks found</p></div>
+          <div class="filters"><input id="search" placeholder="Search city, truck, use..." /><select id="driverFilter"><option>All</option><option>With Driver</option><option>Self-Drive</option></select><select id="typeFilter"><option>All</option></select></div>
+        </div>
+        <div class="truckgrid" id="truckGrid"></div>
+        <div class="empty" id="emptyState" style="display:none">No trucks match that search. Try clearing a filter.</div>
+      </div>
+    </section>
+
+    <section id="dashboard">
+      <div class="wrap">
+        <div class="head"><div><div class="mini">Booking dashboard</div><h2>Booking requests</h2><p>Owners accept or decline. Renters track status.</p></div><button class="btn" id="refreshBookingsBtn">Refresh</button></div>
+        <div class="card pad"><div id="bookingList" class="steps"><div class="empty">No bookings yet.</div></div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="head"><div><div class="mini">Business mode</div><h2>Manual payments for now</h2><p>Until Stripe is unlocked, use this simple field-tested flow.</p></div></div>
+        <div class="prodgrid">
+          <div class="card prod"><h3>1. Request</h3><b>Renter sends booking</b><p>The booking lands in the owner/renter dashboard.</p></div>
+          <div class="card prod"><h3>2. Confirm</h3><b>Owner accepts</b><p>Owner calls/texts renter to confirm details and payment method.</p></div>
+          <div class="card prod"><h3>3. Pay manually</h3><b>Cash App / Venmo / Zelle / cash</b><p>Keep records until Stripe can be added safely.</p></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer"><div class="wrap">HaulNOW marketplace. Built for quick launch, then upgrades.</div></footer>
+  <div class="toast" id="toast">Saved</div>
+  <script src="app.js"></script>
 </body>
 </html>

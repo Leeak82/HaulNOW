@@ -8,7 +8,7 @@
     ? window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY)
     : null;
 
-  let renterBookings = [];
+  let visibleBookings = [];
 
   function toast(message) {
     const box = document.getElementById("toast");
@@ -24,24 +24,24 @@
     return data?.session || null;
   }
 
-  async function loadRenterBookings() {
+  async function loadVisibleBookings() {
     const session = await getSession();
     const user = session?.user;
     if (!stripeDb || !user) return [];
 
     const { data, error } = await stripeDb
       .from("bookings")
-      .select("id, renter_id, status, payment_status, created_at")
-      .eq("renter_id", user.id)
+      .select("id, owner_id, renter_id, status, payment_status, created_at")
+      .or(`owner_id.eq.${user.id},renter_id.eq.${user.id}`)
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("Could not load renter bookings for Stripe buttons", error);
+      console.error("Could not load bookings for Stripe buttons", error);
       return [];
     }
 
-    renterBookings = data || [];
-    return renterBookings;
+    visibleBookings = data || [];
+    return visibleBookings;
   }
 
   async function payBooking(bookingId) {
@@ -49,6 +49,10 @@
       const session = await getSession();
       const token = session?.access_token;
       if (!token) return toast("Sign in first");
+
+      if (stripeApiUrl.includes("localhost") && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
+        return toast("Payment server is not deployed yet");
+      }
 
       toast("Opening secure checkout...");
       const res = await fetch(`${stripeApiUrl}/create-checkout-session`, {
@@ -70,22 +74,27 @@
   }
 
   async function addPaymentButtons() {
-    const bookings = await loadRenterBookings();
+    const bookings = await loadVisibleBookings();
     if (!bookings.length) return;
 
     document.querySelectorAll(".bookingRow").forEach((row, index) => {
       const booking = bookings[index];
       if (!booking) return;
+      if (booking.renter_id !== bookings[index].renter_id) return;
       if (["paid", "declined", "cancelled_by_admin"].includes(booking.status)) return;
+      if (booking.renter_id !== bookings[index].renter_id) return;
       if (row.querySelector(".stripePayBtn")) return;
 
-      const actions = row.querySelector(".bookingActions") || row;
-      const btn = document.createElement("button");
-      btn.className = "btn primary stripePayBtn";
-      btn.type = "button";
-      btn.textContent = "Pay Securely";
-      btn.onclick = () => payBooking(booking.id);
-      actions.prepend(btn);
+      getSession().then((session) => {
+        if (!session?.user || booking.renter_id !== session.user.id) return;
+        const actions = row.querySelector(".bookingActions") || row;
+        const btn = document.createElement("button");
+        btn.className = "btn primary stripePayBtn";
+        btn.type = "button";
+        btn.textContent = "Pay Securely";
+        btn.onclick = () => payBooking(booking.id);
+        actions.prepend(btn);
+      });
     });
   }
 

@@ -4,6 +4,11 @@
 (function () {
   const cfg = window.HAULNOW_CONFIG || {};
   const stripeApiUrl = cfg.STRIPE_API_URL || "http://localhost:4242";
+  const stripeDb = cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY
+    ? window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY)
+    : null;
+
+  let renterBookings = [];
 
   function toast(message) {
     const box = document.getElementById("toast");
@@ -13,15 +18,36 @@
     setTimeout(() => box.classList.remove("show"), 1800);
   }
 
-  async function getAccessToken() {
-    if (!window.db?.auth) return null;
-    const { data } = await window.db.auth.getSession();
-    return data?.session?.access_token || null;
+  async function getSession() {
+    if (!stripeDb?.auth) return null;
+    const { data } = await stripeDb.auth.getSession();
+    return data?.session || null;
+  }
+
+  async function loadRenterBookings() {
+    const session = await getSession();
+    const user = session?.user;
+    if (!stripeDb || !user) return [];
+
+    const { data, error } = await stripeDb
+      .from("bookings")
+      .select("id, renter_id, status, payment_status, created_at")
+      .eq("renter_id", user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Could not load renter bookings for Stripe buttons", error);
+      return [];
+    }
+
+    renterBookings = data || [];
+    return renterBookings;
   }
 
   async function payBooking(bookingId) {
     try {
-      const token = await getAccessToken();
+      const session = await getSession();
+      const token = session?.access_token;
       if (!token) return toast("Sign in first");
 
       toast("Opening secure checkout...");
@@ -43,12 +69,13 @@
     }
   }
 
-  function addPaymentButtons() {
-    if (!Array.isArray(window.bookings) || !window.currentUser) return;
+  async function addPaymentButtons() {
+    const bookings = await loadRenterBookings();
+    if (!bookings.length) return;
 
     document.querySelectorAll(".bookingRow").forEach((row, index) => {
-      const booking = window.bookings[index];
-      if (!booking || booking.renter_id !== window.currentUser.id) return;
+      const booking = bookings[index];
+      if (!booking) return;
       if (["paid", "declined", "cancelled_by_admin"].includes(booking.status)) return;
       if (row.querySelector(".stripePayBtn")) return;
 
@@ -62,14 +89,17 @@
     });
   }
 
-  const oldRenderBookings = window.renderBookings;
-  if (typeof oldRenderBookings === "function") {
-    window.renderBookings = function patchedRenderBookings() {
-      oldRenderBookings();
-      addPaymentButtons();
-    };
-  }
+  const observer = new MutationObserver(() => addPaymentButtons());
+  const startObserver = () => {
+    const bookingList = document.getElementById("bookingList");
+    if (bookingList) observer.observe(bookingList, { childList: true, subtree: true });
+    addPaymentButtons();
+  };
 
   window.payBooking = payBooking;
-  setTimeout(addPaymentButtons, 600);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", startObserver);
+  } else {
+    startObserver();
+  }
 })();

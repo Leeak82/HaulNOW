@@ -1,0 +1,11 @@
+{
+  "name": "haulnow-deploy-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Root deploy wrapper for the HaulNOW Stripe backend in /server.",
+  "scripts": {
+    "postinstall": "npm --prefix server install",
+    "start": "npm --prefix server start",
+    "dev": "npm --prefix server run dev"
+  }
+}

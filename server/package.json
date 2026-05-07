@@ -1,0 +1,18 @@
+{
+  "name": "haulnow-stripe-server",
+  "version": "1.0.0",
+  "description": "HaulNOW Stripe Checkout backend",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "latest",
+    "cors": "latest",
+    "dotenv": "latest",
+    "express": "latest",
+    "stripe": "latest"
+  }
+}

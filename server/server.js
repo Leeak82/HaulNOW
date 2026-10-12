@@ -5,18 +5,24 @@ import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
 const app = express();
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
 const PORT = process.env.PORT || 4242;
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+const supabase = (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) : null;
+const missing = () => ['STRIPE_SECRET_KEY','SUPABASE_URL','SUPABASE_SERVICE_ROLE_KEY'].filter(k => !process.env[k]);
+const requireConfig = (extra = []) => (req, res, next) => {
+  const m = [...missing(), ...extra.filter(k => !process.env[k])];
+  if (m.length) return res.status(503).json({ error: 'Server not configured: missing ' + m.join(', ') });
+  next();
+};
 
-app.use(cors({ origin: CLIENT_URL }));
+app.use(cors({ origin: CLIENT_URL.replace(/\/HaulNOW\/?$/, '') }));
 
-app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+app.post('/webhook', requireConfig(['STRIPE_WEBHOOK_SECRET']), express.raw({ type: 'application/json' }), async (req, res) => {
   const sig = req.headers['stripe-signature'];
   let event;
 
@@ -52,10 +58,10 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
 app.use(express.json());
 
 app.get('/health', (_req, res) => {
-  res.json({ ok: true, app: 'HaulNOW Stripe server' });
+  res.json({ ok: true, app: 'HaulNOW Stripe server', missing_env: missing() });
 });
 
-app.post('/create-checkout-session', async (req, res) => {
+app.post('/create-checkout-session', requireConfig(), async (req, res) => {
   try {
     const authHeader = req.headers.authorization || '';
     const token = authHeader.replace('Bearer ', '').trim();

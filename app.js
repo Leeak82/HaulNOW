@@ -10,7 +10,7 @@ const $ = (id) => document.getElementById(id);
 const safe = (id) => $(id) || { textContent: "", innerHTML: "", value: "", style: {}, onclick: null, onsubmit: null, addEventListener: () => {} };
 
 const demoListings = [
-  { id: "demo-1", title: "Ford F-350 Super Duty", type: "Pickup Truck", city: "Tacoma, WA", rate: 120, rate_type: "day", driver_option: "With or without driver", capacity: "4,200 lb payload", use_case: "Moving, hauling, dump runs", owner: "HaulNOW Demo Owner", phone: "253-555-0123", email: "owner@example.com", image: "", verified: true, rating: "New" },
+  { id: "demo-1", title: "Ford F-350 Super Duty", type: "Pickup Truck", city: "Denver, CO", rate: 120, rate_type: "day", driver_option: "With or without driver", capacity: "4,200 lb payload", use_case: "Moving, hauling, dump runs", owner: "HaulNOW Demo Owner", phone: "253-555-0123", email: "owner@example.com", image: "", verified: true, rating: "New" },
   { id: "demo-2", title: "26 ft Box Truck With Liftgate", type: "Box Truck", city: "Seattle, WA", rate: 95, rate_type: "hour", driver_option: "Driver included only", capacity: "26 ft box / liftgate", use_case: "Furniture, appliances, business deliveries", owner: "HaulNOW Demo Fleet", phone: "206-555-0188", email: "fleet@example.com", image: "", verified: true, rating: "New" }
 ];
 

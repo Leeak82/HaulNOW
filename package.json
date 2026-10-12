@@ -6,6 +6,8 @@
   "scripts": {
     "postinstall": "npm --prefix server install",
     "start": "npm --prefix server start",
-    "dev": "npm --prefix server run dev"
+    "dev": "npm --prefix server run dev",
+    "test": "node --test tests/",
+    "test:policies": "bash tests/policies.sh"
   }
 }

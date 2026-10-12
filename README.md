@@ -82,3 +82,9 @@ This project has been useful for learning how frontend interactions, backend API
 ## Support
 
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/anthonyleebuilds)
+
+## Security setup (required)
+
+After `supabase_schema.sql` and `stripe_supabase_update.sql`, run `supabase_security.sql` in the Supabase SQL Editor. It is safe to re-run. It adds row-level security for profiles, listings and bookings, adds `profiles.role`, and moves owner phone/email into the private `listing_contacts` table, which only the owner, admins, or a renter with an accepted or paid booking can read.
+
+Tests: `npm test` (escape helper) and `npm run test:policies` (needs local PostgreSQL; spins up a throwaway cluster).

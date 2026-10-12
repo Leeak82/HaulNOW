@@ -80,6 +80,7 @@ app.post('/create-checkout-session', async (req, res) => {
     if (bookingError || !booking) return res.status(404).json({ error: 'Booking not found' });
     if (booking.renter_id !== user.id) return res.status(403).json({ error: 'Only the renter can pay this booking' });
     if (booking.status === 'paid') return res.status(400).json({ error: 'Booking already paid' });
+    if (!['accepted', 'payment_pending'].includes(booking.status)) return res.status(400).json({ error: 'The owner has to accept this booking before payment' });
 
     const listing = booking.truck_listings;
     const rate = Number(listing?.rate || 0);

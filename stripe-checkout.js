@@ -77,12 +77,11 @@
     const bookings = await loadVisibleBookings();
     if (!bookings.length) return;
 
-    document.querySelectorAll(".bookingRow").forEach((row, index) => {
-      const booking = bookings[index];
+    const byId = new Map(bookings.map((b) => [String(b.id), b]));
+    document.querySelectorAll(".bookingRow").forEach((row) => {
+      const booking = byId.get(row.dataset.bookingId);
       if (!booking) return;
-      if (booking.renter_id !== bookings[index].renter_id) return;
-      if (["paid", "declined", "cancelled_by_admin"].includes(booking.status)) return;
-      if (booking.renter_id !== bookings[index].renter_id) return;
+      if (!["accepted", "payment_pending"].includes(booking.status)) return;
       if (row.querySelector(".stripePayBtn")) return;
 
       getSession().then((session) => {

@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: haulnow-stripe
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: CLIENT_URL
+        value: https://leeak82.github.io/HaulNOW/
+      - key: SUPABASE_URL
+        value: https://ytlhmveceokqlmndnpju.supabase.co
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false

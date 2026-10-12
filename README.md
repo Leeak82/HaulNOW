@@ -78,3 +78,7 @@ Before a real public launch it would still need areas such as stronger authentic
 ## What I Learned Building It
 
 This project has been useful for learning how frontend interactions, backend APIs, payment services, database state, environment configuration, and deployment all connect in a marketplace-style application.
+
+## Support
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/anthonyleebuilds)

@@ -3,8 +3,8 @@
 // Never put a Supabase service_role key or Stripe secret key in this file.
 
 window.HAULNOW_CONFIG = {
-  SUPABASE_URL: "https://ywmeizpynnmbpndywqkm.supabase.co",
-  SUPABASE_ANON_KEY: "sb_publishable_qb2nb8i7HHja5qwBwcr1nA_IqnjQSED",
+  SUPABASE_URL: "https://ytlhmveceokqlmndnpju.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_6izVMggc8qpisWTyWJjMBg_jgJexPxp",
 
   // Replace this after deploying the /server folder to Render, Railway, Fly.io, etc.
   // Example: https://haulnow-stripe-server.onrender.com

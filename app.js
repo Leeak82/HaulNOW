@@ -31,6 +31,7 @@ function setStatus(text, ok = true) { safe("modePill").textContent = text; safe(
 
 if (cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY && !cfg.SUPABASE_URL.includes("PASTE")) {
   db = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+  window.haulnowDb = db; // single shared client (stripe-checkout.js reuses it)
   setStatus("Live marketplace connected", true);
 } else setStatus("Preview marketplace", false);
 

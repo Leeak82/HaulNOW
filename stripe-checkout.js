@@ -4,9 +4,7 @@
 (function () {
   const cfg = window.HAULNOW_CONFIG || {};
   const stripeApiUrl = cfg.STRIPE_API_URL || "http://localhost:4242";
-  const stripeDb = cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY
-    ? window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY)
-    : null;
+  const stripeDb = window.haulnowDb || null; // reuse app.js client; never create a second one
 
   let visibleBookings = [];
 
